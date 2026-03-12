@@ -1,0 +1,7 @@
+Group		
+1=ADHD		
+2=Controls	
+		
+Sex		
+1=female	
+2=male		
