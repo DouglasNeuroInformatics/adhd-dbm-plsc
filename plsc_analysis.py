@@ -1,5 +1,3 @@
-08:37 moncia in SSH tri-login04 in r_analysis on git main [x!?] via py v3.10.13 (r_analysis) via r v4.4.0 
-> cat plsc_analysis.py 
 #!/usr/bin/env python3
 """
 Behavioral PLSC (Partial Least Squares Correlation) analysis for the ADHD DBM project.
@@ -249,8 +247,8 @@ def write_summary(path, run_info, df_info, results, posthoc, behavioral_cols, dr
                 f.write(f"  {'Behavior':<30} {'Loading':>10} {'CI_low':>10} {'CI_high':>10}\n")
                 for j, col in enumerate(behavioral_cols):
                     loading = y_loadings[j, lv]
-                    ci_lo = y_ci[0, j, lv]
-                    ci_hi = y_ci[1, j, lv]
+                    ci_lo = y_ci[j, lv, 0]
+                    ci_hi = y_ci[j, lv, 1]
                     cross_zero = " (n.s.)" if ci_lo <= 0 <= ci_hi else ""
                     f.write(f"  {col:<30} {loading:>10.4f} {ci_lo:>10.4f} {ci_hi:>10.4f}{cross_zero}\n")
                 f.write("\n")
@@ -388,29 +386,36 @@ def main():
     print(f"  seed={SEED}, rotate={ROTATE}, n_proc={n_proc}")
     print("=" * 60)
 
-    pls_start = time.time()
-
-    pls_kwargs = dict(
-        X=X,
-        Y=Y,
-        groups=[sum(groups)],
-        n_cond=1,
-        n_perm=N_PERM,
-        n_boot=N_BOOT,
-        seed=SEED,
-        rotate=ROTATE,
-        n_proc=n_proc,
-    )
-    if N_SPLIT > 0:
-        pls_kwargs["n_split"] = N_SPLIT
-
-    results = pyls.behavioral_pls(**pls_kwargs)
-
     import pickle
     _ckpt = os.path.join(OUTPUT_DIR, "results_raw.pkl")
-    with open(_ckpt, "wb") as _f:
-        pickle.dump(results, _f)
-    print(f"  Checkpoint saved: {_ckpt}")
+
+    pls_start = time.time()
+
+    if os.path.exists(_ckpt):
+        print(f"\nCheckpoint found — loading results from {_ckpt}")
+        print("  (skipping permutation tests and bootstrap)")
+        with open(_ckpt, "rb") as _f:
+            results = pickle.load(_f)
+    else:
+        pls_kwargs = dict(
+            X=X,
+            Y=Y,
+            groups=[sum(groups)],
+            n_cond=1,
+            n_perm=N_PERM,
+            n_boot=N_BOOT,
+            seed=SEED,
+            rotate=ROTATE,
+            n_proc=n_proc,
+        )
+        if N_SPLIT > 0:
+            pls_kwargs["n_split"] = N_SPLIT
+
+        results = pyls.behavioral_pls(**pls_kwargs)
+
+        with open(_ckpt, "wb") as _f:
+            pickle.dump(results, _f)
+        print(f"  Checkpoint saved: {_ckpt}")
 
     pls_elapsed = time.time() - pls_start
     print(f"\nPLS completed in {pls_elapsed / 60:.1f} minutes")
