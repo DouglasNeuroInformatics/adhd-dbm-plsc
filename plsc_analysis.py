@@ -359,44 +359,46 @@ def main():
     Y = zscore(Y_raw, axis=0, ddof=1)
     print(f"  Y shape: {Y.shape} (subjects x behaviors)")
 
-    # --- Validate jacobian paths ---
-    print("\nValidating jacobian file paths...")
-    jacobian_paths = df["relative_jacobian"].tolist()
-    missing = [p for p in jacobian_paths if not os.path.isfile(p)]
-    if missing:
-        print(f"  ERROR: {len(missing)} jacobian files not found. First 5:")
-        for p in missing[:5]:
-            print(f"    {p}")
-        sys.exit(1)
-    print(f"  All {len(jacobian_paths)} jacobian files found.")
-
-    # --- Build X matrix ---
-    print("\nBuilding X matrix...")
-    mask_path = os.path.join(WORKING_DIR, MASK_FILE)
-    mask_bool, mask_shape = load_mask(mask_path)
-
-    X = load_jacobians(jacobian_paths, mask_bool, mask_shape)
-    print(f"  X shape: {X.shape} (subjects x voxels)")
-    print(f"  X memory: {X.nbytes / 1e9:.2f} GB")
-
-    # --- Run behavioral PLS ---
-    print("\n" + "=" * 60)
-    print("Running behavioral PLS...")
-    print(f"  n_perm={N_PERM}, n_boot={N_BOOT}, n_split={N_SPLIT}")
-    print(f"  seed={SEED}, rotate={ROTATE}, n_proc={n_proc}")
-    print("=" * 60)
-
+    # --- Check for checkpoint (skip jacobian loading and PLS if found) ---
     import pickle
     _ckpt = os.path.join(OUTPUT_DIR, "results_raw.pkl")
-
     pls_start = time.time()
 
     if os.path.exists(_ckpt):
         print(f"\nCheckpoint found — loading results from {_ckpt}")
-        print("  (skipping permutation tests and bootstrap)")
+        print("  (skipping jacobian loading, permutation tests, and bootstrap)")
         with open(_ckpt, "rb") as _f:
             results = pickle.load(_f)
+        n_voxels = results["x_weights"].shape[0]
     else:
+        # --- Validate jacobian paths ---
+        print("\nValidating jacobian file paths...")
+        jacobian_paths = df["relative_jacobian"].tolist()
+        missing = [p for p in jacobian_paths if not os.path.isfile(p)]
+        if missing:
+            print(f"  ERROR: {len(missing)} jacobian files not found. First 5:")
+            for p in missing[:5]:
+                print(f"    {p}")
+            sys.exit(1)
+        print(f"  All {len(jacobian_paths)} jacobian files found.")
+
+        # --- Build X matrix ---
+        print("\nBuilding X matrix...")
+        mask_path = os.path.join(WORKING_DIR, MASK_FILE)
+        mask_bool, mask_shape = load_mask(mask_path)
+
+        X = load_jacobians(jacobian_paths, mask_bool, mask_shape)
+        print(f"  X shape: {X.shape} (subjects x voxels)")
+        print(f"  X memory: {X.nbytes / 1e9:.2f} GB")
+        n_voxels = int(np.sum(mask_bool))
+
+        # --- Run behavioral PLS ---
+        print("\n" + "=" * 60)
+        print("Running behavioral PLS...")
+        print(f"  n_perm={N_PERM}, n_boot={N_BOOT}, n_split={N_SPLIT}")
+        print(f"  seed={SEED}, rotate={ROTATE}, n_proc={n_proc}")
+        print("=" * 60)
+
         pls_kwargs = dict(
             X=X,
             Y=Y,
@@ -509,7 +511,7 @@ def main():
         "Subjects dropped": before_n - after_n,
         "Group sizes": f"{dict(zip(GROUP_ORDER, groups))}",
         "Behavioral variables": len(behavioral_cols),
-        "Voxels in mask": int(np.sum(mask_bool)),
+        "Voxels in mask": n_voxels,
     }
 
     summary_path = os.path.join(OUTPUT_DIR, "plsc_summary.txt")
