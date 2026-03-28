@@ -1,3 +1,5 @@
+08:37 moncia in SSH tri-login04 in r_analysis on git main [x!?] via py v3.10.13 (r_analysis) via r v4.4.0 
+> cat plsc_analysis.py 
 #!/usr/bin/env python3
 """
 Behavioral PLSC (Partial Least Squares Correlation) analysis for the ADHD DBM project.
@@ -201,7 +203,9 @@ def write_summary(path, run_info, df_info, results, posthoc, behavioral_cols, dr
         f.write("-" * 40 + "\n")
         f.write(f"  {'LV':<5} {'SingVal':>10} {'VarExp%':>10} {'Perm p':>10}")
 
-        has_split = "splitres" in results and results["splitres"] is not None and "ucorr" in results["splitres"]
+        has_split = ("splitres" in results
+                     and results["splitres"] is not None
+                     and "ucorr" in results["splitres"])
         if has_split:
             f.write(f" {'ucorr':>8} {'ucorr_p':>10} {'vcorr':>8} {'vcorr_p':>10}")
         f.write("\n")
@@ -402,6 +406,12 @@ def main():
 
     results = pyls.behavioral_pls(**pls_kwargs)
 
+    import pickle
+    _ckpt = os.path.join(OUTPUT_DIR, "results_raw.pkl")
+    with open(_ckpt, "wb") as _f:
+        pickle.dump(results, _f)
+    print(f"  Checkpoint saved: {_ckpt}")
+
     pls_elapsed = time.time() - pls_start
     print(f"\nPLS completed in {pls_elapsed / 60:.1f} minutes")
 
@@ -452,7 +462,10 @@ def main():
         x_weights_normed=results["bootres"]["x_weights_normed"],
         y_loadings_ci=results["bootres"]["y_loadings_ci"],
     )
-     if "splitres" in results and results["splitres"] is not None and "ucorr" in results["splitres"]:
+    if (N_SPLIT > 0
+            and "splitres" in results
+            and results["splitres"] is not None
+            and "ucorr" in results["splitres"]):
         npz_data["ucorr"] = results["splitres"]["ucorr"]
         npz_data["vcorr"] = results["splitres"]["vcorr"]
         npz_data["ucorr_pvals"] = results["splitres"]["ucorr_pvals"]
