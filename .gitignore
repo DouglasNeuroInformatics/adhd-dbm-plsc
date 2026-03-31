@@ -1,0 +1,43 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+# Results (large / reproducible from code)
+plsc_results*/
+plsc_plots/
+basic_stats_results/
+univariate_trillium/
+post_hoc_analysis/
+
+# Legacy and development
+legacy/
+test/
+.venv/
+
+# Sensitive participant data
+Demographic_Data_*.tsv
+original_demographics/
+
+# Neuroimaging binaries
+*.mnc
+*.mnc.gz
+
+# Large binary outputs
+*.npz
+*.pkl
+*.rds
+
+# Logs and cluster output
+logs/
+slurm_submission/
+*.out
+slurm_output_*.txt
+plsc_output_*.txt
+
+# Scratch summary outputs
+descriptives_combined.csv
+group_comparison_tests_combined.txt
+
+# Editor lock files
+.~lock.*
