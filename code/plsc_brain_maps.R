@@ -6,9 +6,9 @@ library(tidyverse)
 # CONFIGURATION
 # ============================================================
 RESULTS_DIR  <- "plsc_results_1000_bootstrap_no_groups"
-OUTPUT_DIR   <- "plsc_plots"
-MASK_FILE    <- "mask_shapeupdate.mnc"
-ANAT_FILE    <- "/home/moncia/scratch/projects/hailab_ADHD/dbm/optimized_antsMultivariateTemplateConstruction/output/final/average/template_sharpen_shapeupdate.mnc"
+OUTPUT_DIR   <- "../plsc_plots"
+MASK_FILE    <- "../data/mask_shapeupdate.mnc"
+ANAT_FILE    <- "../data/template_sharpen_shapeupdate.mnc"
 BSR_THRESH   <- 1.95   # p < 0.05
 ALPHA        <- 0.05
 
@@ -29,6 +29,27 @@ cat(sprintf("Significant LVs: %s\n", paste(sig_lvs, collapse = ", ")))
 cat("Loading mask...\n")
 mask_vol  <- mincGetVolume(MASK_FILE)
 mask_bool <- mask_vol > 0.5
+mask_array <- mincArray(mask_vol)
+
+# ============================================================
+# COMPUTE CROP BOUNDS FROM MASK
+# ============================================================
+CROP_PADDING <- 5  # voxels of padding around the mask
+
+bounds <- which(mask_array > 0.5, arr.ind = TRUE) %>%
+  as_tibble() %>%
+  gather(dim, index) %>%
+  group_by(dim) %>%
+  summarize(
+    min_slice = max(min(index) - CROP_PADDING, 1),
+    max_slice = max(index) + CROP_PADDING,
+    .groups = "drop"
+  )
+
+cat(sprintf("Crop bounds — dim1: %d-%d, dim2: %d-%d, dim3: %d-%d\n",
+            bounds$min_slice[[1]], bounds$max_slice[[1]],
+            bounds$min_slice[[2]], bounds$max_slice[[2]],
+            bounds$min_slice[[3]], bounds$max_slice[[3]]))
 
 # ============================================================
 # VISUALISE WITH MRIcrotome
