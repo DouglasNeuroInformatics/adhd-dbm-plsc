@@ -1,0 +1,6 @@
+double check
+
+module load cobralab
+uv pip install setuptools<72, numpy<2
+pyproject.toml 
+uv pip isntall --no-build-isolation
