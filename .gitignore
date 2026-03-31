@@ -5,7 +5,6 @@
 
 # Results (large / reproducible from code)
 plsc_results*/
-plsc_plots/
 basic_stats_results/
 univariate_trillium/
 post_hoc_analysis/
@@ -15,13 +14,14 @@ legacy/
 test/
 .venv/
 
-# Sensitive participant data
+# Participant data
 Demographic_Data_*.tsv
 original_demographics/
 
 # Neuroimaging binaries
 *.mnc
-*.mnc.gz
+*.nii
+*.nii.gz
 
 # Large binary outputs
 *.npz
