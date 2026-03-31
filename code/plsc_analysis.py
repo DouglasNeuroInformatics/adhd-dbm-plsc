@@ -35,9 +35,10 @@ BEHAVIORAL_COLS = [
     "BASC_Agg",
     "BASC_Withdrawal",
     "BASC_Adap",
-    "BASC_Externalizing",
-    "BASC_Internalizing",
-    "BRIEFP_BRI_B",
+    # Composites removed their subscales are already included above,
+    # BASC_Externalizing = Hyperactivity + Aggression
+    # BASC_Internalizing = Anxiety + Depression + Withdrawal
+    # BRIEFP_BRI_B = Inh_B + Shi_B + Emotional_Control
     "BRIEFP_Inh_B",
     "BRIEFP_Shi_B",
     "BRIEFP_Emotional_Control",
@@ -56,7 +57,7 @@ COVARIATE_COLS = ["Age_years", "Sex"]
 
 # PLS parameters
 N_PERM = 5000       # Permutation tests for LV significance
-N_BOOT = 5000       # Bootstrap resampling for feature reliability
+N_BOOT = 1000       # Bootstrap resampling for feature reliability
 N_SPLIT = 0         # Split-half reliability (set to 0 to skip — saves hours of runtime)
 SEED = 42           # For reproducibility
 N_PROC =   16# "max" to use all cores, or an integer
