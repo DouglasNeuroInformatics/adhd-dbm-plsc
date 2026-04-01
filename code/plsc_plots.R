@@ -4,8 +4,8 @@ library(patchwork)
 # ============================================================
 # CONFIGURATION
 # ============================================================
-RESULTS_DIR <- "plsc_results_1000_bootstrap_no_groups"
-OUTPUT_DIR  <- "plsc_plots"
+RESULTS_DIR <- "../plsc_outputs_bootstrap_1000"
+OUTPUT_DIR  <- "../plsc_plots_no_composites"
 ALPHA       <- 0.05
 
 BEHAVIORAL_NAMES <- c(

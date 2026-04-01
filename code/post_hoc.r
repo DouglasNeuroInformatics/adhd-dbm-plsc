@@ -1,9 +1,9 @@
 library(tidyverse)
  
-df <- read_csv("../plsc_results_1000_bootstrap_no_groups/lv_scores.csv")
+df <- read_csv("../plsc_outputs_bootstrap_1000/lv_scores.csv")
 
 # Correlations per group per LV
-for (lv in 1:5) {
+for (lv in 1:4) {
   cat(sprintf("\n--- LV%d ---\n", lv))
   for (grp in c("ADHD", "Control")) {
     sub <- df %>% filter(Group == grp)
@@ -12,8 +12,8 @@ for (lv in 1:5) {
   }
 }
 
-# Plot all 5 LVs
-plots <- map(1:5, function(lv) {
+# Plot all 4 LVs
+plots <- map(1:4, function(lv) {
   ggplot(df, aes_string(x = paste0("x_lv", lv), y = paste0("y_lv", lv), colour = "Group")) +
     geom_point(alpha = 0.7) +
     geom_smooth(method = "lm", se = TRUE) +
@@ -23,7 +23,7 @@ plots <- map(1:5, function(lv) {
 })
 
 # Save as multi-page PDF
-pdf("../plsc_results_1000_bootstrap_no_groups/posthoc_lv_by_group.pdf", width = 6, height = 5)
+pdf("../plsc_outputs_bootstrap_1000/posthoc_lv_by_group.pdf", width = 6, height = 5)
 walk(plots, print)
 dev.off()
 cat("\nSaved posthoc_lv_by_group.pdf\n")

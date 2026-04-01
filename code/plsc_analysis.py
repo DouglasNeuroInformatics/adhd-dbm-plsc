@@ -15,10 +15,6 @@ Dependencies:
 # CONFIGURATION — Edit this section before running
 # ============================================================
 
-WORKING_DIR = "/home/moncia/scratch/projects/hailab_ADHD/r_analysis"
-DEMOGRAPHICS_FILE = "./Demographic_Data_ADHD_combined_Jan102026_cleaned.tsv"
-MASK_FILE = "mask_shapeupdate.mnc"
-OUTPUT_DIR = "plsc_results"
 
 # Behavioral columns to include in Y matrix.
 # Comment out or remove columns you don't want.
@@ -61,6 +57,11 @@ N_BOOT = 1000       # Bootstrap resampling for feature reliability
 N_SPLIT = 0         # Split-half reliability (set to 0 to skip — saves hours of runtime)
 SEED = 42           # For reproducibility
 N_PROC =   16# "max" to use all cores, or an integer
+
+WORKING_DIR = "/home/moncia/scratch/projects/hailab_ADHD/r_analysis"
+DEMOGRAPHICS_FILE = "data/Demographic_Data_ADHD_combined_Jan102026_cleaned.tsv"
+MASK_FILE = "data/mask_shapeupdate.mnc"
+OUTPUT_DIR = f"plsc_outputs_bootstrap_{N_BOOT}"
 
 # Procrustes rotation: False recommended by CoBrALab wiki to avoid bias
 # where LV1 is virtually always significant due to rotation artifact.

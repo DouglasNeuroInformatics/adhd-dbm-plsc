@@ -5,8 +5,8 @@ library(tidyverse)
 # ============================================================
 # CONFIGURATION
 # ============================================================
-RESULTS_DIR  <- "plsc_results_1000_bootstrap_no_groups"
-OUTPUT_DIR   <- "../plsc_plots"
+RESULTS_DIR  <- "../plsc_outputs_bootstrap_1000"
+OUTPUT_DIR   <- "../plsc_plots_no_composites"
 MASK_FILE    <- "../data/mask_shapeupdate.mnc"
 ANAT_FILE    <- "../data/template_sharpen_shapeupdate.mnc"
 BSR_THRESH   <- 1.95   # p < 0.05
@@ -34,7 +34,7 @@ mask_array <- mincArray(mask_vol)
 # ============================================================
 # COMPUTE CROP BOUNDS FROM MASK
 # ============================================================
-CROP_PADDING <- 5  # voxels of padding around the mask
+CROP_PADDING <-  15 # voxels of padding around the mask
 
 bounds <- which(mask_array > 0.5, arr.ind = TRUE) %>%
   as_tibble() %>%
@@ -58,12 +58,32 @@ if (!file.exists(ANAT_FILE)) {
   cat(sprintf("\nWARNING: Anatomy file not found: %s\n", ANAT_FILE))
 } else {
   anat <- mincArray(mincGetVolume(ANAT_FILE))
-
-  # Check volume sizes
   cat(sprintf("Anatomy dimensions: %s\n", paste(dim(anat), collapse = " x ")))
 
+
+  # Crop to mask bounds
+  anat_cropped <- anat[bounds$min_slice[[1]]:bounds$max_slice[[1]],
+                       bounds$min_slice[[2]]:bounds$max_slice[[2]],
+                       bounds$min_slice[[3]]:bounds$max_slice[[3]]]
+
+  cat(sprintf("Cropped dimensions: %s\n", paste(dim(anat_cropped), collapse = " x ")))
+
+
+  dim1_begin <- 25
+  dim1_end   <- 275
+  dim2_begin <- 25
+  dim2_end   <- 340
+  dim3_begin <- 50
+  dim3_end   <- 290
+
+  cat(sprintf("Cropped dim1: %d-%d, dim2: %d-%d, dim3: %d-%d\n",
+              dim1_begin, dim1_end,
+              dim2_begin, dim2_end,
+              dim3_begin, dim3_end))
+
+
   for (lv in sig_lvs) {
-    bsr_path <- file.path(OUTPUT_DIR, "bsr_minc", sprintf("bsr_LV%d.mnc", lv))
+    bsr_path <- file.path(RESULTS_DIR, "bsr_minc", sprintf("bsr_LV%d.mnc", lv))
 
     if (!file.exists(bsr_path)) {
       cat(sprintf("  SKIPPING LV%d — file not found: %s\n", lv, bsr_path))
@@ -75,20 +95,42 @@ if (!file.exists(ANAT_FILE)) {
     bsr_vol  <- mincArray(bsr_flat)
     cat(sprintf("\nLV%d — max BSR: %.3f\n", lv, max_bsr))
 
+    # Crop BSR volume to same bounds
+    bsr_cropped <- bsr_vol[bounds$min_slice[[1]]:bounds$max_slice[[1]],
+                           bounds$min_slice[[2]]:bounds$max_slice[[2]],
+                           bounds$min_slice[[3]]:bounds$max_slice[[3]]]
+
     fname <- file.path(OUTPUT_DIR, sprintf("plot_D_brainmap_LV%d.pdf", lv))
     pdf(fname, width = 12, height = 8)
 
-    # Axial (dimension=1, z-axis, 420 voxels), voxel indices
-    ss <- sliceSeries(nrow = 4, ncol = 6, begin = 100, end = 360, dimension = 1) %>%
-      anatomy(anat, low = 0.5, high = 4.5) %>%
-      addtitle(sprintf("LV%d BSR map  (threshold: +/-%.2f, p < 0.05)", lv, BSR_THRESH)) %>%
-      overlay(bsr_vol,
-              low       = BSR_THRESH,
-              high      = max_bsr,
-              symmetric = TRUE,
-              col       = colorRampPalette(c("red", "yellow", "white"))(255)) %>%
-      legend("BSR")
-    draw(ss)
+    tryCatch({
+      sliceSeries(nrow = 5, ncol = 2, dimension = 1, begin=dim1_begin, end=dim1_end) %>%
+        anatomy(anat_cropped, low = 0.5, high = 4.5) %>%
+        addtitle(sprintf("LV%d BSR (thresh: +/-%.2f) Saggital", lv, BSR_THRESH)) %>%
+        overlay(bsr_cropped,
+                low       = BSR_THRESH,
+                high      = max_bsr,
+                symmetric = TRUE,
+                col       = colorRampPalette(c("red", "yellow", "white"))(255)) %>%
+      sliceSeries(nrow = 5, ncol = 2, dimension = 2, begin=dim2_begin, end=dim2_end) %>%
+        anatomy(anat_cropped, low = 0.5, high = 4.5) %>%
+        addtitle("Coronal") %>%
+        overlay(bsr_cropped,
+                low       = BSR_THRESH,
+                high      = max_bsr,
+                symmetric = TRUE,
+                col       = colorRampPalette(c("red", "yellow", "white"))(255)) %>%
+      sliceSeries(nrow = 5, ncol = 2, dimension = 3, begin=dim3_begin, end=dim3_end) %>%
+        anatomy(anat_cropped, low = 0.5, high = 4.5) %>%
+        addtitle("Axial") %>%
+        overlay(bsr_cropped,
+                low       = BSR_THRESH,
+                high      = max_bsr,
+                symmetric = TRUE,
+                col       = colorRampPalette(c("red", "yellow", "white"))(255)) %>%
+        legend("BSR") %>%
+        draw()
+    }, error = function(e) { cat("ERROR:", conditionMessage(e), "\n") })
 
     dev.off()
     cat(sprintf("  Saved %s\n", fname))

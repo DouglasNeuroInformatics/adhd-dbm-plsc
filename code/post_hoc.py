@@ -5,8 +5,11 @@ import os
 WORKING_DIR = "/home/moncia/scratch/projects/hailab_ADHD/r_analysis"
 os.chdir(WORKING_DIR)
 
-results = np.load("plsc_results_1000_bootstrap_no_groups/plsc_results_key.npz")
-subjects = pd.read_csv("plsc_results_1000_bootstrap_no_groups/subject_list.csv")
+
+results = np.load("plsc_outputs_bootstrap_1000/plsc_results_key.npz")
+subjects = pd.read_csv("plsc_outputs_bootstrap_1000/subject_list.csv")
+
+
 
 x_scores = results["x_scores"]  # 81 x 22
 y_scores = results["y_scores"]  # 81 x 22
@@ -16,6 +19,6 @@ for lv in range(5):
     df[f"x_lv{lv+1}"] = x_scores[:, lv]
     df[f"y_lv{lv+1}"] = y_scores[:, lv]
 
-df.to_csv("plsc_results_1000_bootstrap_no_groups/lv_scores.csv", index=False)
-print("Saved plsc_results_1000_bootstrap_no_groups/lv_scores.csv")
+df.to_csv("plsc_outputs_bootstrap_1000/lv_scores.csv", index=False)
+print("Saved plsc_outputs_bootstrap_1000/lv_scores.csv")
 print(df.head())
