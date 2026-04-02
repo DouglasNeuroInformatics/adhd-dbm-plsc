@@ -60,7 +60,8 @@ N_PROC =   16# "max" to use all cores, or an integer
 
 WORKING_DIR = "/home/moncia/scratch/projects/hailab_ADHD/r_analysis"
 DEMOGRAPHICS_FILE = "data/Demographic_Data_ADHD_combined_Jan102026_cleaned.tsv"
-MASK_FILE = "data/mask_shapeupdate.mnc"
+MASK_FILE     = "data/mask_shapeupdate.mnc"
+TEMPLATE_FILE = "data/template_sharpen_shapeupdate.mnc"
 OUTPUT_DIR = f"plsc_outputs_bootstrap_{N_BOOT}"
 
 # Procrustes rotation: False recommended by CoBrALab wiki to avoid bias
@@ -93,6 +94,7 @@ import pyls
 WORKING_DIR       = os.environ.get("WORKING_DIR",        WORKING_DIR)
 DEMOGRAPHICS_FILE = os.environ.get("DEMOGRAPHICS_FILE",  DEMOGRAPHICS_FILE)
 MASK_FILE         = os.environ.get("MASK_FILE",          MASK_FILE)
+TEMPLATE_FILE     = os.environ.get("TEMPLATE_FILE",      TEMPLATE_FILE)
 N_PERM  = int(os.environ.get("N_PERM",  N_PERM))
 N_BOOT  = int(os.environ.get("N_BOOT",  N_BOOT))
 N_SPLIT = int(os.environ.get("N_SPLIT", N_SPLIT))
@@ -401,7 +403,11 @@ def main():
 
         # --- Build X matrix ---
         print("\nBuilding X matrix...")
-        mask_path = os.path.join(WORKING_DIR, MASK_FILE)
+        mask_path = os.path.join(WORKING_DIR, MASK_FILE) if MASK_FILE else ""
+        if not mask_path or not os.path.isfile(mask_path):
+            template_path = os.path.join(WORKING_DIR, TEMPLATE_FILE) if TEMPLATE_FILE else ""
+            print(f"  MASK_FILE not found — deriving mask from template (> 0.5): {template_path}")
+            mask_path = template_path
         mask_bool, mask_shape = load_mask(mask_path)
 
         X = load_jacobians(jacobian_paths, mask_bool, mask_shape)

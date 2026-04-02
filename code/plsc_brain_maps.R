@@ -24,11 +24,17 @@ dir.create(OUTPUT_DIR, showWarnings = FALSE, recursive = TRUE)
 cat(sprintf("Significant LVs: %s\n", paste(sig_lvs, collapse = ", ")))
 
 # ============================================================
-# LOAD MASK
+# LOAD MASK (or derive from template if mask not present)
 # ============================================================
+mask_path <- if (MASK_FILE != "" && file.exists(MASK_FILE)) MASK_FILE else ANAT_FILE
+if (mask_path != MASK_FILE) cat(sprintf("MASK_FILE not found — deriving mask from template (> 0.5): %s\n", mask_path))
+if (!file.exists(mask_path)) {
+  cat(sprintf("Mask not found (%s) — skipping brain maps\n", mask_path))
+  quit(status = 0)
+}
 cat("Loading mask...\n")
-mask_vol  <- mincGetVolume(MASK_FILE)
-mask_bool <- mask_vol > 0.5
+mask_vol   <- mincGetVolume(mask_path)
+mask_bool  <- mask_vol > 0.5
 mask_array <- mincArray(mask_vol)
 
 # ============================================================

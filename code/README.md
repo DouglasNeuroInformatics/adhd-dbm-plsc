@@ -19,7 +19,7 @@ paths before running.
 
 ## 1. Data preparation
 
-Convert jacobian NIfTI files to MINC:
+Convert jacobian, mask, and template NIfTI files to MINC:
 ```bash
 bash hpc/mnc_convert.sh <ANALYSIS_NAME>
 ```
@@ -28,8 +28,6 @@ Append jacobian paths to demographics file and save to `analysis/<ANALYSIS_NAME>
 ```bash
 bash hpc/clean_data.sh <ANALYSIS_NAME> Demographics_raw.tsv
 ```
-
-Copy/symlink mask and template into `analysis/<ANALYSIS_NAME>/data/` manually.
 
 ---
 

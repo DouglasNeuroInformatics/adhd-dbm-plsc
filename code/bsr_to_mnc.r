@@ -7,7 +7,12 @@ dir.create(output_dir, showWarnings=FALSE, recursive=TRUE)
 
 bsr   <- read.csv(paste0(results_dir, "/x_weights_normed.csv"), header=FALSE)
 pvals <- as.numeric(read.csv(paste0(results_dir, "/pvals.csv"), header=FALSE)[[1]])
-mask  <- mincGetVolume(Sys.getenv("MASK_FILE", unset = "../data/mask_shapeupdate.mnc"))
+mask_file <- Sys.getenv("MASK_FILE", unset = "")
+if (mask_file == "" || !file.exists(mask_file)) {
+  mask_file <- Sys.getenv("TEMPLATE_FILE", unset = "")
+  cat(sprintf("MASK_FILE not found — deriving mask from template (> 0.5): %s\n", mask_file))
+}
+mask <- mincGetVolume(mask_file)
 
 cat("BSR:", nrow(bsr), "voxels x", ncol(bsr), "LVs\n")
 cat("Sig LVs (p<0.05):", which(pvals < 0.05), "\n")
