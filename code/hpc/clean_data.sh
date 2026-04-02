@@ -1,16 +1,13 @@
 #!/bin/bash
-# Usage: ./clean_data.sh <ANALYSIS_NAME> <data_file.txt>
-# Appends relative_jacobian paths from JACOBIAN_DIR to the demographics file
-# and writes the result to analysis/<ANALYSIS_NAME>/data/
+# Usage: ./clean_data.sh <ANALYSIS_NAME>
+# Appends jacobian paths from JACOBIAN_DIR to RAW_DEMOGRAPHICS_FILE
+# and writes the result to DEMOGRAPHICS_FILE (analysis/<ANALYSIS_NAME>/data/cleaned_<ANALYSIS_NAME>.tsv)
 
-ANALYSIS_NAME="${1:?Usage: ./clean_data.sh <ANALYSIS_NAME> <data_file.txt>}"
-INPUT="${2:?Usage: ./clean_data.sh <ANALYSIS_NAME> <data_file.txt>}"
-
+ANALYSIS_NAME="${1:?Usage: ./clean_data.sh <ANALYSIS_NAME>}"
 source "$(dirname "$0")/plsc_config.sh" "$ANALYSIS_NAME"
 mkdir -p "${ANALYSIS_DIR}/data"
 
 TMP=$(mktemp)
-_TS="$(date +%Y%m%d_%H%M)"
 
 first_line=true
 path_errors=false
@@ -30,11 +27,10 @@ while IFS= read -r line; do
     [[ -z "$path" ]] && path="NOT_FOUND" && path_errors=true
 
     printf '%s\t%s\n' "$line" "$path"
-done < "$INPUT" > "$TMP"
+done < "$RAW_DEMOGRAPHICS_FILE" > "$TMP"
 
-OUT="${ANALYSIS_DIR}/data/cleaned_${_TS}_$(basename "$INPUT")"
-mv "$TMP" "$OUT"
-echo "Done: $OUT"
+mv "$TMP" "$DEMOGRAPHICS_FILE"
+echo "Done: $DEMOGRAPHICS_FILE"
 if $path_errors; then
-        echo "Some files were not found, check output file"
+    echo "Some files were not found, check output file"
 fi

@@ -24,9 +24,9 @@ Convert jacobian, mask, and template NIfTI files to MINC:
 bash hpc/mnc_convert.sh <ANALYSIS_NAME>
 ```
 
-Append jacobian paths to demographics file and save to `analysis/<ANALYSIS_NAME>/data/`:
+Append jacobian paths to demographics file and save to `analysis/<ANALYSIS_NAME>/data/cleaned_<ANALYSIS_NAME>.tsv`:
 ```bash
-bash hpc/clean_data.sh <ANALYSIS_NAME> Demographics_raw.tsv
+bash hpc/clean_data.sh <ANALYSIS_NAME>
 ```
 
 ---

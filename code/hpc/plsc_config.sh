@@ -18,7 +18,10 @@ JACOBIAN_DIR="${DBM_PATH}/dbm/jacobian/relative/smooth"
 
 # ── Analayis Dir Paths ─────────────────────────────────────────────────────────────────────
 ANALYSIS_DIR="/home/moncia/scratch/projects/hailab_ADHD/r_analysis/analysis/${ANALYSIS_NAME}"
-DEMOGRAPHICS_FILE="${ANALYSIS_DIR}/data/Demographic_Data_ADHD_combined_Jan102026_cleaned.tsv"
+# Raw file (hardcoded input — edit if source data changes)
+RAW_DEMOGRAPHICS_FILE="/home/moncia/scratch/projects/hailab_ADHD/r_analysis/data/Demographic_Data_ADHD_combined_Jan102026.tsv"
+# Cleaned file (output of clean_data.sh, input to PLSC — name derived from ANALYSIS_NAME)
+DEMOGRAPHICS_FILE="${ANALYSIS_DIR}/data/cleaned_${ANALYSIS_NAME}.tsv"
 # Optional — steps that need these files will skip gracefully if not present
 MASK_FILE="${FINAL_PATH}/mask_shapeupdate.mnc"
 TEMPLATE_FILE="${FINAL_PATH}/template_sharpen_shapeupdate.mnc"
