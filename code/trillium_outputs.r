@@ -2,13 +2,18 @@ library(RMINC)
 library(MRIcrotome)
 library(magrittr)
 
-input_dir  <- "univariate_trillium"
-output_dir <- "univariate_trillium/outputs"
+analysis_dir  <- Sys.getenv("ANALYSIS_DIR", unset = ".")
+template_file <- Sys.getenv("TEMPLATE_FILE", unset = "")
+mask_file     <- Sys.getenv("MASK_FILE",     unset = "")
+
+input_dir  <- file.path(analysis_dir, "univariate_trillium")
+output_dir <- file.path(analysis_dir, "univariate_trillium", "outputs")
 dir.create(output_dir, showWarnings=FALSE, recursive=TRUE)
 
-mask <- "/home/moncia/scratch/projects/hailab_ADHD/r_analysis/mask_shapeupdate.mnc"
-template_path <- "/home/moncia/scratch/projects/hailab_ADHD/dbm/optimized_antsMultivariateTemplateConstruction/output/final/average/template_sharpen_shapeupdate.mnc"
-anatVol <- mincArray(mincGetVolume(template_path))
+# Template for anatomy overlay — fall back to mask if template missing
+anat_path <- if (template_file != "" && file.exists(template_file)) template_file else mask_file
+if (anat_path == "" || !file.exists(anat_path)) stop("Neither TEMPLATE_FILE nor MASK_FILE found — cannot generate overlays")
+anatVol <- mincArray(mincGetVolume(anat_path))
 
 # Slice range parameters (template is 420 x 498 x 420)
 dim1_begin <- 50;  dim1_end <- 370   # sagittal

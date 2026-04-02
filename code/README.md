@@ -54,6 +54,6 @@ PLSC_OUTPUT_DIR=/path/to/plsc_outputs_boot1000_perm5000_20260401_1200 \
 ## 3. Univariate (Trillium)
 
 ```bash
-sbatch hpc/trillium_submission.sh        # runs trillium_models.r
-sbatch hpc/trillium_outputs_submission.sh  # runs trillium_outputs.r
+sbatch hpc/trillium_submission.sh <ANALYSIS_NAME>         # runs trillium_models.r
+sbatch hpc/trillium_outputs_submission.sh <ANALYSIS_NAME>  # runs trillium_outputs.r
 ```

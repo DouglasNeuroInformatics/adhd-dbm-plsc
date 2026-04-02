@@ -1,9 +1,23 @@
 library(RMINC)
 
-data       <- read.csv(sep="\t", "~/scratch/projects/hailab_ADHD/r_analysis/Demographic_Data_ADHD_combined_Jan102026_cleaned.tsv")
-output_dir <- "univariate_trillium"
+analysis_dir <- Sys.getenv("ANALYSIS_DIR", unset = ".")
+demo_file    <- Sys.getenv("DEMOGRAPHICS_FILE")
+mask_file    <- Sys.getenv("MASK_FILE",      unset = "")
+template_file <- Sys.getenv("TEMPLATE_FILE", unset = "")
+
+data       <- read.csv(sep="\t", demo_file)
+output_dir <- file.path(analysis_dir, "univariate_trillium")
 dir.create(output_dir, showWarnings=FALSE, recursive=TRUE)
-mask <- "/home/moncia/scratch/projects/hailab_ADHD/r_analysis/mask_shapeupdate.mnc"
+
+# Mask is optional — fall back to template > 0.5 if not present
+if (mask_file != "" && file.exists(mask_file)) {
+  mask <- mask_file
+} else if (template_file != "" && file.exists(template_file)) {
+  cat(sprintf("MASK_FILE not found — using template as mask (> 0.5): %s\n", template_file))
+  mask <- template_file
+} else {
+  mask <- NULL
+}
 
 score_cols <- c("BASC_Hyperactivity", "BASC_Inattention",
                 "BRIEFP_BRI_B", "BRIEFP_Emotional_Control",

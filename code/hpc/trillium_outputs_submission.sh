@@ -4,8 +4,9 @@
 #SBATCH --time 02:00:00
 #SBATCH --output=r_output_outputs_%j.txt
 
-# Load required modules
+source "$(dirname "$0")/plsc_config.sh" "$@"
+export ANALYSIS_DIR MASK_FILE TEMPLATE_FILE
+
 module load StdEnv/2023 cobralab
 
-# Run the R script
-Rscript ./trillium_outputs.r
+Rscript "$(dirname "$0")/../trillium_outputs.r"
