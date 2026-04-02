@@ -1,0 +1,42 @@
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=8
+#SBATCH --time=1:00:00
+#SBATCH --output=plsc_post_%j.txt
+
+# Set PLSC_OUTPUT_DIR to the results directory you want to post-process.
+# Either edit plsc_config.sh (if re-running same params) or override here, e.g.:
+#   PLSC_OUTPUT_DIR=/path/to/plsc_outputs_boot1000_perm5000_20260401_120000 sbatch plsc_post_submission.sh
+
+source "$(dirname "$0")/plsc_config.sh"
+
+# Allow overriding output dir from the environment (e.g. pointing at an older run)
+: "${PLSC_OUTPUT_DIR:?PLSC_OUTPUT_DIR not set}"
+
+export WORKING_DIR MASK_FILE TEMPLATE_FILE PLSC_OUTPUT_DIR PLSC_PLOTS_DIR
+
+module load StdEnv/2023 cobralab
+source "${VENV}"
+
+SCRIPTS="$(dirname "$0")/.."
+echo "Post-processing: ${PLSC_OUTPUT_DIR}"
+
+echo "--- npz_to_csv.py ---"
+python "${SCRIPTS}/npz_to_csv.py" "${PLSC_OUTPUT_DIR}"
+
+echo "--- bsr_to_mnc.r ---"
+Rscript "${SCRIPTS}/bsr_to_mnc.r"
+
+echo "--- post_hoc.py ---"
+python "${SCRIPTS}/post_hoc.py"
+
+echo "--- post_hoc.r ---"
+Rscript "${SCRIPTS}/post_hoc.r"
+
+echo "--- plsc_plots.R ---"
+Rscript "${SCRIPTS}/plsc_plots.R"
+
+echo "--- plsc_brain_maps.R ---"
+Rscript "${SCRIPTS}/plsc_brain_maps.R"
+
+echo "Done. Outputs in: ${PLSC_OUTPUT_DIR}"

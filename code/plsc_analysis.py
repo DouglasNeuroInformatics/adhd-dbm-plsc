@@ -89,6 +89,21 @@ from scipy.stats import zscore
 import statsmodels.api as sm
 import pyls
 
+# ── Override config from environment (set by hpc/plsc_config.sh) ─────────────
+WORKING_DIR       = os.environ.get("WORKING_DIR",        WORKING_DIR)
+DEMOGRAPHICS_FILE = os.environ.get("DEMOGRAPHICS_FILE",  DEMOGRAPHICS_FILE)
+MASK_FILE         = os.environ.get("MASK_FILE",          MASK_FILE)
+N_PERM  = int(os.environ.get("N_PERM",  N_PERM))
+N_BOOT  = int(os.environ.get("N_BOOT",  N_BOOT))
+N_SPLIT = int(os.environ.get("N_SPLIT", N_SPLIT))
+SEED    = int(os.environ.get("SEED",    SEED))
+_n = os.environ.get("N_PROC")
+if _n is not None:
+    N_PROC = "max" if _n == "max" else int(_n)
+del _n
+OUTPUT_DIR = os.environ.get("PLSC_OUTPUT_DIR") or f"plsc_outputs_bootstrap_{N_BOOT}"
+# ─────────────────────────────────────────────────────────────────────────────
+
 
 def load_mask(mask_path):
     """Load a MINC mask and return a flattened boolean array."""

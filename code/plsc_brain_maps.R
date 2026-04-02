@@ -5,10 +5,10 @@ library(tidyverse)
 # ============================================================
 # CONFIGURATION
 # ============================================================
-RESULTS_DIR  <- "../plsc_outputs_bootstrap_1000"
-OUTPUT_DIR   <- "../plsc_plots_no_composites"
-MASK_FILE    <- "../data/mask_shapeupdate.mnc"
-ANAT_FILE    <- "../data/template_sharpen_shapeupdate.mnc"
+RESULTS_DIR  <- Sys.getenv("PLSC_OUTPUT_DIR",  unset = "../plsc_outputs_bootstrap_1000")
+OUTPUT_DIR   <- Sys.getenv("PLSC_PLOTS_DIR",   unset = "../plsc_plots_no_composites")
+MASK_FILE    <- Sys.getenv("MASK_FILE",         unset = "../data/mask_shapeupdate.mnc")
+ANAT_FILE    <- Sys.getenv("TEMPLATE_FILE",     unset = "../data/template_sharpen_shapeupdate.mnc")
 BSR_THRESH   <- 1.95   # p < 0.05
 ALPHA        <- 0.05
 

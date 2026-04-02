@@ -1,6 +1,7 @@
 library(tidyverse)
  
-df <- read_csv("../plsc_outputs_bootstrap_1000/lv_scores.csv")
+plsc_dir <- Sys.getenv("PLSC_OUTPUT_DIR", unset = "../plsc_outputs_bootstrap_1000")
+df <- read_csv(file.path(plsc_dir, "lv_scores.csv"))
 
 # Correlations per group per LV
 for (lv in 1:4) {
@@ -23,7 +24,7 @@ plots <- map(1:4, function(lv) {
 })
 
 # Save as multi-page PDF
-pdf("../plsc_outputs_bootstrap_1000/posthoc_lv_by_group.pdf", width = 6, height = 5)
+pdf(file.path(plsc_dir, "posthoc_lv_by_group.pdf"), width = 6, height = 5)
 walk(plots, print)
 dev.off()
 cat("\nSaved posthoc_lv_by_group.pdf\n")
