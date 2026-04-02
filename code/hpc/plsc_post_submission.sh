@@ -4,11 +4,11 @@
 #SBATCH --time=1:00:00
 #SBATCH --output=plsc_post_%j.txt
 
-# Set PLSC_OUTPUT_DIR to the results directory you want to post-process.
-# Either edit plsc_config.sh (if re-running same params) or override here, e.g.:
-#   PLSC_OUTPUT_DIR=/path/to/plsc_outputs_boot1000_perm5000_20260401_120000 sbatch plsc_post_submission.sh
+# Pass ANALYSIS_NAME as first arg. To point at a specific older run, override PLSC_OUTPUT_DIR:
+#   PLSC_OUTPUT_DIR=/path/to/plsc_outputs_boot1000_perm5000_20260401_120000 \
+#     sbatch plsc_post_submission.sh combined_jan2026
 
-source "$(dirname "$0")/plsc_config.sh"
+source "$(dirname "$0")/plsc_config.sh" "$@"
 
 # Allow overriding output dir from the environment (e.g. pointing at an older run)
 : "${PLSC_OUTPUT_DIR:?PLSC_OUTPUT_DIR not set}"

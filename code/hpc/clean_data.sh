@@ -1,9 +1,16 @@
 #!/bin/bash
-# Usage: ./append_path.sh <data_file.txt>
+# Usage: ./clean_data.sh <ANALYSIS_NAME> <data_file.txt>
+# Appends relative_jacobian paths from JACOBIAN_DIR to the demographics file
+# and writes the result to analysis/<ANALYSIS_NAME>/data/
 
-JACOBIAN_DIR="/home/moncia/scratch/projects/hailab_ADHD/dbm/optimized_antsMultivariateTemplateConstruction/output/dbm/jacobian/relative/smooth"
-INPUT="$1"
+ANALYSIS_NAME="${1:?Usage: ./clean_data.sh <ANALYSIS_NAME> <data_file.txt>}"
+INPUT="${2:?Usage: ./clean_data.sh <ANALYSIS_NAME> <data_file.txt>}"
+
+source "$(dirname "$0")/plsc_config.sh" "$ANALYSIS_NAME"
+mkdir -p "${ANALYSIS_DIR}/data"
+
 TMP=$(mktemp)
+_TS="$(date +%Y%m%d_%H%M)"
 
 first_line=true
 path_errors=false
@@ -25,8 +32,9 @@ while IFS= read -r line; do
     printf '%s\t%s\n' "$line" "$path"
 done < "$INPUT" > "$TMP"
 
-mv "$TMP" "$INPUT"
-echo "Done: $INPUT"
+OUT="${ANALYSIS_DIR}/data/cleaned_${_TS}_$(basename "$INPUT")"
+mv "$TMP" "$OUT"
+echo "Done: $OUT"
 if $path_errors; then
         echo "Some files were not found, check output file"
 fi
