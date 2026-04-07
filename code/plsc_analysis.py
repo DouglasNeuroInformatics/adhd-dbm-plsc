@@ -162,16 +162,21 @@ def run_posthoc_correlations(x_scores, y_scores, covariates_df):
     # Dummy-code Sex: Female=0, Male=1
     cov_df = covariates_df.copy()
     if "Sex" in cov_df.columns:
-        cov_df["Sex"] = cov_df["Sex"].map({"Female": 0, "Male": 1})
+        sex_map = {"female": 0, "male": 1}
+        cov_df["Sex"] = cov_df["Sex"].astype(str).str.strip().str.lower().map(sex_map)
 
     results = {}
     for cov_name in cov_df.columns:
         cov_vals = cov_df[cov_name].values.astype(float)
-        X_ols = sm.add_constant(cov_vals)
+        valid = np.isfinite(cov_vals)
+        if not valid.all():
+            n_dropped = (~valid).sum()
+            print(f"  WARNING: {cov_name} has {n_dropped} NaN/inf values — dropping those subjects for this OLS")
 
         results[cov_name] = {}
         for score_name, scores in [("x_scores", x_scores), ("y_scores", y_scores)]:
-            model = sm.OLS(scores, X_ols).fit()
+            X_ols = sm.add_constant(cov_vals[valid])
+            model = sm.OLS(scores[valid], X_ols).fit()
             results[cov_name][score_name] = {
                 "beta": model.params[1],
                 "t": model.tvalues[1],

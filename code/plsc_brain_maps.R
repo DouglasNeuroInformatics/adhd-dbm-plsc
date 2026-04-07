@@ -112,34 +112,37 @@ if (!file.exists(ANAT_FILE)) {
     tryCatch({
       sliceSeries(nrow = 5, ncol = 2, dimension = 1, begin=dim1_begin, end=dim1_end) %>%
         anatomy(anat_cropped,
-          low = 0.5, high = 5.2,
+          low = 0.5, high = 9.7,
           col = colorRampPalette(c("black", "grey50", "white"))(255)) %>%
         addtitle(sprintf("LV%d BSR (thresh: +/-%.2f) Saggital", lv, BSR_THRESH)) %>%
         overlay(bsr_cropped,
-                low       = BSR_THRESH,
+                low       = 0,
                 high      = max_bsr,
                 symmetric = TRUE,
                 col       = colorRampPalette(c("red", "yellow", "white"))(255)) %>%
+        contours(abs(bsr_cropped), levels = BSR_THRESH, lwd = 2, col = "black") %>%
       sliceSeries(nrow = 5, ncol = 2, dimension = 2, begin=dim2_begin, end=dim2_end) %>%
         anatomy(anat_cropped,
-          low = 0.5, high = 5.2,
+          low = 0.5, high = 9.7,
           col = colorRampPalette(c("black", "grey50", "white"))(255)) %>%
         addtitle("Coronal") %>%
         overlay(bsr_cropped,
-                low       = BSR_THRESH,
+                low       = 0,
                 high      = max_bsr,
                 symmetric = TRUE,
                 col       = colorRampPalette(c("red", "yellow", "white"))(255)) %>%
+        contours(abs(bsr_cropped), levels = BSR_THRESH, lwd = 2, col = "black") %>%
       sliceSeries(nrow = 5, ncol = 2, dimension = 3, begin=dim3_begin, end=dim3_end) %>%
         anatomy(anat_cropped,
-          low = 0.5, high = 5.2,
+          low = 0.5, high = 9.7,
           col = colorRampPalette(c("black", "grey50", "white"))(255)) %>%
         addtitle("Axial") %>%
         overlay(bsr_cropped,
-                low       = BSR_THRESH,
+                low       = 0,
                 high      = max_bsr,
                 symmetric = TRUE,
                 col       = colorRampPalette(c("red", "yellow", "white"))(255)) %>%
+        contours(abs(bsr_cropped), levels = BSR_THRESH, lwd = 2, col = "black") %>%
         legend("BSR") %>%
         draw()
     }, error = function(e) { cat("ERROR:", conditionMessage(e), "\n") })

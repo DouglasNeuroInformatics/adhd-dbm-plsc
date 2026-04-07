@@ -92,15 +92,23 @@ for (name in model_names) {
   tvalue_cols <- model_cols[grep("^tvalue-", model_cols)]
 
   for (predictor in tvalue_cols) {
-    # Use 20% FDR threshold as lower bound if available, otherwise default to 2
+    # Lower: 5% FDR; upper: 1% FDR or max t-value if unavailable
     lowerthreshold <- 2
+    upperthreshold <- NULL
     if (!is.null(thresholds) && predictor %in% colnames(thresholds)) {
-      fdr_val <- thresholds["0.2", predictor]
-      if (!is.na(fdr_val) && is.finite(fdr_val) && fdr_val > 0) {
-        lowerthreshold <- fdr_val
+      fdr_05 <- thresholds["0.05", predictor]
+      fdr_01 <- thresholds["0.01", predictor]
+      if (!is.na(fdr_05) && is.finite(fdr_05) && fdr_05 > 0) {
+        lowerthreshold <- fdr_05
+      }
+      if (!is.na(fdr_01) && is.finite(fdr_01) && fdr_01 > 0) {
+        upperthreshold <- fdr_01
       }
     }
-    upperthreshold <- lowerthreshold * 2
+    if (is.null(upperthreshold)) {
+      tvals <- as.numeric(model[, predictor])
+      upperthreshold <- round(max(abs(tvals[is.finite(tvals)]), na.rm = TRUE), 2)
+    }
 
     safe_name <- gsub("[^A-Za-z0-9_.-]", "_", paste0(name, "_", predictor))
     outfile <- file.path(output_dir, paste0("slices_", safe_name, ".png"))

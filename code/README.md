@@ -31,22 +31,27 @@ bash hpc/clean_data.sh <ANALYSIS_NAME>
 
 ---
 
+All `sbatch` commands must be run from inside the `hpc/` directory:
+```bash
+cd hpc
+```
+
 ## 2. PLSC
 
 Run the main analysis (~5 hrs):
 ```bash
-sbatch hpc/plsc_submission.sh <ANALYSIS_NAME>
+sbatch plsc_submission.sh <ANALYSIS_NAME>
 ```
 
 Run post-processing (runs in sequence: npz_to_csv → bsr_to_mnc → post_hoc → plsc_plots → plsc_brain_maps):
 ```bash
-sbatch hpc/plsc_post_submission.sh <ANALYSIS_NAME>
+sbatch plsc_post_submission.sh <ANALYSIS_NAME>
 ```
 
 To reprocess a specific older run without re-running PLSC:
 ```bash
 PLSC_OUTPUT_DIR=/path/to/plsc_outputs_boot1000_perm5000_20260401_1200 \
-  sbatch hpc/plsc_post_submission.sh <ANALYSIS_NAME>
+  sbatch plsc_post_submission.sh <ANALYSIS_NAME>
 ```
 
 ---
@@ -54,6 +59,24 @@ PLSC_OUTPUT_DIR=/path/to/plsc_outputs_boot1000_perm5000_20260401_1200 \
 ## 3. Univariate (Trillium)
 
 ```bash
-sbatch hpc/trillium_submission.sh <ANALYSIS_NAME>         # runs trillium_models.r
-sbatch hpc/trillium_outputs_submission.sh <ANALYSIS_NAME>  # runs trillium_outputs.r
+sbatch trillium_submission.sh <ANALYSIS_NAME>         # runs trillium_models.r
+sbatch trillium_outputs_submission.sh <ANALYSIS_NAME>  # runs trillium_outputs.r
 ```
+
+
+
+
+
+  # 1. Convert NIfTI → MINC (jacobians + mask/template in FINAL_PATH)
+  bash hpc/mnc_convert.sh <ANALYSIS_NAME>
+
+  # 2. Build cleaned demographics
+  bash hpc/clean_data.sh <ANALYSIS_NAME>
+
+  # 3. Univariate
+  sbatch hpc/trillium_submission.sh <ANALYSIS_NAME>
+  sbatch hpc/trillium_outputs_submission.sh <ANALYSIS_NAME>   # after step 3 completes
+
+  # 4. PLSC
+  sbatch hpc/plsc_submission.sh <ANALYSIS_NAME>
+  sbatch hpc/plsc_post_submission.sh <ANALYSIS_NAME>          # after step 4 completes

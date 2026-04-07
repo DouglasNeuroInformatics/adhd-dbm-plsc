@@ -26,6 +26,7 @@ BEGIN { FS = OFS = "\t" }
 # ── Header ────────────────────────────────────────────────────────────────────
 NR == 1 {
     gsub(/\r/, "")
+    ncols = NF
     for (i = 1; i <= NF; i++) {
         if ($i == "Group")       gcol = i
         if ($i == "Sex")         scol = i
@@ -40,21 +41,28 @@ NR == 1 {
 {
     gsub(/\r/, "")
 
+    if (NF != ncols) next
+
     # Drop rows with any QC note
     if (qcol && $qcol != "") {
-        print "  QC drop: subject " $1 " (" $qcol ")"
+        print "  QC drop: subject " $1 " (" $qcol ")" > "/dev/stderr"
         dropped++
         next
     }
 
     # Recode Group and Sex
-    if (gcol) { sub(/^1$/, "ADHD",     $gcol); sub(/^2$/, "Controls", $gcol) }
+    if (gcol) { sub(/^1$/, "ADHD",     $gcol); sub(/^2$/, "Control", $gcol) }
     if (scol) { sub(/^1$/, "female",   $scol); sub(/^2$/, "male",     $scol) }
 
     # Look up jacobian path for this subject
     cmd  = "find " jdir " -maxdepth 1 -name \"sub-" $1 "_*.mnc\" 2>/dev/null | head -1"
     path = ""
-    if ((cmd | getline path) <= 0 || path == "") { path = "NOT_FOUND"; errors++ }
+    if ((cmd | getline path) <= 0 || path == "") {
+        print "  Jacobian drop: subject " $1 " (no file found)" > "/dev/stderr"
+        errors++
+        close(cmd)
+        next
+    }
     close(cmd)
 
     $(NF + 1) = path
@@ -62,8 +70,8 @@ NR == 1 {
 }
 
 END {
-    if (dropped) print dropped " row(s) dropped due to QC notes"
-    if (errors)  print errors  " subject(s) had no jacobian file found"
+    if (dropped) print dropped " row(s) dropped due to QC notes" > "/dev/stderr"
+    if (errors)  print errors  " subject(s) dropped (no jacobian file found)" > "/dev/stderr"
 }
 ' "$RAW_DEMOGRAPHICS_FILE" > "$TMP" && mv "$TMP" "$DEMOGRAPHICS_FILE"
 
