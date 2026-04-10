@@ -36,7 +36,10 @@ Rscript "${SCRIPTS}/post_hoc.r"
 echo "--- plsc_plots.R ---"
 Rscript "${SCRIPTS}/plsc_plots.R"
 
-echo "--- plsc_brain_maps.R ---"
-Rscript "${SCRIPTS}/plsc_brain_maps.R"
+echo "--- plsc_brain_maps_load.R ---"
+Rscript "${SCRIPTS}/plsc_brain_maps_load.R"
+
+echo "--- plsc_brain_maps_plot.R ---"
+Rscript "${SCRIPTS}/plsc_brain_maps_plot.R"
 
 echo "Done. Outputs in: ${PLSC_OUTPUT_DIR}"
