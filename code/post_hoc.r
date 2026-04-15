@@ -1,6 +1,6 @@
 library(tidyverse)
  
-plsc_dir <- Sys.getenv("PLSC_OUTPUT_DIR", unset = "../plsc_outputs_bootstrap_1000")
+plsc_dir <- Sys.getenv("PLSC_OUTPUT_DIR", unset = "")
 df <- read_csv(file.path(plsc_dir, "lv_scores.csv"))
 
 # Correlations per group per LV

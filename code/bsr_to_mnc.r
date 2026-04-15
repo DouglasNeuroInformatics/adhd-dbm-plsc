@@ -1,6 +1,6 @@
 library(RMINC)
 
-results_dir <- Sys.getenv("PLSC_OUTPUT_DIR", unset = "../plsc_outputs_bootstrap_1000")
+results_dir <- Sys.getenv("PLSC_OUTPUT_DIR", unset = "")
 output_dir  <- file.path(results_dir, "bsr_minc")
 dir.create(output_dir, showWarnings=FALSE, recursive=TRUE)
 

@@ -4,8 +4,8 @@ library(patchwork)
 # ============================================================
 # CONFIGURATION
 # ============================================================
-RESULTS_DIR <- Sys.getenv("PLSC_OUTPUT_DIR", unset = "../plsc_outputs_bootstrap_1000")
-OUTPUT_DIR  <- Sys.getenv("PLSC_PLOTS_DIR",  unset = "../plsc_plots_no_composites")
+RESULTS_DIR <- Sys.getenv("PLSC_OUTPUT_DIR", unset = "")
+OUTPUT_DIR  <- Sys.getenv("PLSC_PLOTS_DIR",  unset = "")
 ALPHA       <- 0.05
 
 BEHAVIORAL_NAMES <- c(

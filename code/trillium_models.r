@@ -16,7 +16,7 @@ if (mask_file != "" && file.exists(mask_file)) {
   cat(sprintf("MASK_FILE not found — using template as mask (> 0.5): %s\n", template_file))
   mask <- template_file
 } else {
-  mask <- NULL
+  stop("Neither MASK_FILE nor TEMPLATE_FILE found — cannot run without a mask")
 }
 
 score_cols <- c("BASC_Hyperactivity", "BASC_Inattention",

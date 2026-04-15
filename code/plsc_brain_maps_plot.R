@@ -4,7 +4,7 @@ library(magrittr)
 # ============================================================
 # CONFIGURATION
 # ============================================================
-OUTPUT_DIR <- Sys.getenv("PLSC_PLOTS_DIR", unset = "../plsc_plots_no_composites")
+OUTPUT_DIR <- Sys.getenv("PLSC_PLOTS_DIR", unset = "")
 CACHE_DIR  <- file.path(OUTPUT_DIR, "cache")
 
 dir.create(OUTPUT_DIR, showWarnings = FALSE, recursive = TRUE)
