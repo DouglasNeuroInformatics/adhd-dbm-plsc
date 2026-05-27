@@ -4,6 +4,7 @@
 .Ruserdata
 
 # Results (large / reproducible from code)
+analysis/
 plsc_results*/
 basic_stats_results/
 univariate_trillium/
@@ -17,6 +18,7 @@ test/
 # Participant data
 Demographic_Data_*.tsv
 original_demographics/
+data/
 
 # Neuroimaging binaries
 *.mnc
@@ -28,12 +30,16 @@ original_demographics/
 *.pkl
 *.rds
 
+# Generated plots
+*.pdf
+
 # Logs and cluster output
 logs/
 slurm_submission/
 *.out
 slurm_output_*.txt
 plsc_output_*.txt
+code/hpc/*.txt
 
 # Scratch summary outputs
 descriptives_combined.csv
