@@ -47,8 +47,6 @@ The resulting log relative Jacobian determinants are related to 19 clinical and 
 │       ├── clean_data.sh         # Build cleaned demographics from raw input
 │       ├── mnc_convert.sh        # NIfTI to MINC conversion
 │       └── mnc_convert_submission.sh
-├── data/
-│   └── README.md                 # Data schema, QC exclusions, external paths
 └── pyproject.toml
 ```
 
